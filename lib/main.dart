@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
       ),
       builder: DevicePreview.appBuilder,
       locale: DevicePreview.locale(context),
-      home: const TopPage(title: 'Flutter Demo Home Pageff'),
+      home: const TopPage(title: 'Flutter Demo Home Pafgeff'),
     );
   }
 }
