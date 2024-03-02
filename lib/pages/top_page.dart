@@ -47,13 +47,7 @@ class _TopPageState extends State<TopPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-<<<<<<< HEAD
-        title: const Text("Flutter-firebase-5"),
-=======
-
         title: const Text("Flutter-firebase2"),
-
->>>>>>> 1f1064ac8fb7b0e288775bc28704e2e94a7334cc
       ),
       body: StreamBuilder<QuerySnapshot>(
           stream: memoCollection
