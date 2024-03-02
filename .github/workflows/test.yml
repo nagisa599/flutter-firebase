@@ -1,0 +1,66 @@
+name: Flutter Web Build and Deploy
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: "stable" # ここはバージョン固定したほうがいいです
+          cache: true
+
+      - run: flutter pub get
+      - run: flutter build web --web-renderer html
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: ./build/web
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
+
+      - name: Notify Pull Request
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v4
+        with:
+          script: |
+            const pullRequestNumber = context.issue.number;
+            const repositoryOwner = context.repo.owner;
+            const repositoryName = context.repo.repo;
+            const pageUrl = `https://${repositoryOwner}.github.io/${repositoryName}/`;
+            const comment = `Preview URL for this pull request: ${pageUrl}`;
+            github.issues.createComment({
+              owner: repositoryOwner,
+              repo: repositoryName,
+              issue_number: pullRequestNumber,
+              body: comment
+            });
