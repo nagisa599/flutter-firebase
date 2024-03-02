@@ -58,7 +58,7 @@ class _TopPageState extends State<TopPage> {
               return const Center(child: CircularProgressIndicator());
             }
             if (!snapshot.hasData) {
-              return const Center(child: Text('データがありません'));
+              return const Center(child: Text('データがありません2'));
             }
 
             final docs = snapshot.data!.docs;
