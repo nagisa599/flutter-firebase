@@ -1,47 +1,53 @@
-name: Cleanup Vercel Deployments on PR Close
+name: Remove Vercel Preview Deployment
 
 on:
   pull_request:
     types: [closed]
+    branches:
+      - develop
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
 
 jobs:
-  cleanup:
+  remove-deployment:
+    if: github.event.pull_request.merged == true || github.event.pull_request.state == 'closed'
     runs-on: ubuntu-latest
     steps:
+      - name: Deploy to Vercel and get deployment URL
+        id: vercel_deploy
+        run: |
+          DEPLOYMENT_URL=$(vercel --token ${{ secrets.TOKEN }} --scope ${{ secrets.VERCEL_ORG_ID }} | tail -1)
+          echo "Deployment URL: $DEPLOYMENT_URL"
+          echo "::set-output name=url::$DEPLOYMENT_URL"
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Comment Deploy URL on PR
+        uses: actions/github-script@v5
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const deploymentUrl = '${{ steps.vercel_deploy.outputs.url }}';
+            const message = `Preview Deployment URL: ${deploymentUrl}`;
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: message
+            });
+
       - name: Checkout
         uses: actions/checkout@v3
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: "14"
 
       - name: Install Vercel CLI
         run: npm install -g vercel
 
-      - name: Fetch Deployments
-        id: fetch_deployments
-        run: |
-          echo "Fetching deployments for the closed PR branch..."
-
-          DEPLOYMENTS=$(vercel list ${{ github.repository }} --token ${{ secrets.TOKEN }} --json)
-          echo "::set-output name=deployments::$DEPLOYMENTS"
+      - name: Remove Vercel Deployment
+        run: vercel rm --token ${{ secrets.TOKEN }} --yes <Deployment ID>
         env:
-          VERCEL_TOKEN: ${{ secrets.TOKEN }}
-
-
-      - name: Filter and Remove Deployments
-        run: |
-          DEPLOYMENTS="${{ steps.fetch_deployments.outputs.deployments }}"
-          BRANCH_NAME="${{ github.head_ref }}"
-          echo "Filtering deployments for branch: $BRANCH_NAME"
-
-          DEPLOYMENT_IDS=$(echo $DEPLOYMENTS | jq -r --arg BRANCH_NAME "$BRANCH_NAME" '.[] | select(.name | test($BRANCH_NAME)) | .uid')
-
-          for ID in $DEPLOYMENT_IDS; do
-            echo "Removing deployment: $ID"
-            vercel remove $ID --yes --token ${{ secrets.TOKEN }}
-          done
-        env:
-          VERCEL_TOKEN: ${{ secrets.TOKEN }}
-
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}

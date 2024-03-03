@@ -1,9 +1,9 @@
-name: Flutter Web Build and Deploy to Vercel
+name: Flutter Web Build and Deploy to Vercel Preview
 
 on:
   pull_request:
     branches:
-      - main
+      - develop
 
 permissions:
   contents: read
@@ -32,9 +32,9 @@ jobs:
       - name: Install Vercel CLI
         run: npm i -g vercel
 
-      - name: Deploy to Vercel
+      - name: Deploy to Vercel Preview
         id: deploy
-        run: echo "::set-output name=url::$(vercel deploy --prod --token ${{ secrets.TOKEN }} | grep -oP 'https://\S+\.vercel\.app')"
+        run: echo "::set-output name=url::$(vercel --token ${{ secrets.TOKEN }} | grep -oP 'https://\S+\.vercel\.app')"
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
@@ -45,7 +45,7 @@ jobs:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
             const url = '${{ steps.deploy.outputs.url }}';
-            const message = `Deployed URL: ${url}`;
+            const message = `Preview Deployed URL: ${url}`;
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
