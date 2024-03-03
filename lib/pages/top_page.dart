@@ -101,7 +101,7 @@ class _TopPageState extends State<TopPage> {
                                     ),
                                     ListTile(
                                       leading: Icon(Icons.delete),
-                                      title: Text('削除'),
+                                      title: Text('削除1'),
                                       onTap: (() async {
                                         await deleteMemo(fetchMemo.id);
                                         setState(() {});
