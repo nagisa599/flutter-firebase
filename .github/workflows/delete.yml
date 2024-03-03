@@ -22,5 +22,6 @@ jobs:
       - name: Remove Deployment
         run: node remove-deployment.js
         env:
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
           VERCEL_TOKEN: ${{ secrets.TOKEN }}
           BRANCH_NAME: ${{ github.head_ref }}

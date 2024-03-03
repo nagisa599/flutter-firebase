@@ -1,10 +1,11 @@
 const fetch = require("node-fetch");
 const VERCEL_TOKEN = process.env.VERCEL_TOKEN;
 const BRANCH_NAME = process.env.BRANCH_NAME;
+const VERCEL_PROJECT_ID = process.env.VERCEL_PROJECT_ID;
 
 const getDeployments = async () => {
   const response = await fetch(
-    `https://api.vercel.com/v6/deployments?teamId=YOUR_TEAM_ID`,
+    `https://api.vercel.com/v6/deployments?projectId=${VERCEL_PROJECT_ID}`,
     {
       headers: { Authorization: `Bearer ${VERCEL_TOKEN}` },
     }
