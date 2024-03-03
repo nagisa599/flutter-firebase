@@ -23,10 +23,18 @@ const getDeployments = async () => {
 };
 
 const removeDeployment = async (id) => {
-  await fetch(`https://api.vercel.com/v13/deployments/${id}`, {
-    method: "DELETE",
-    headers: { Authorization: `Bearer ${VERCEL_TOKEN}` },
-  });
+  try {
+    const response = await fetch(
+      `https://api.vercel.com/v13/deployments/${id}`,
+      {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${VERCEL_TOKEN}` },
+      }
+    );
+    console.log(response);
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 const run = async () => {
