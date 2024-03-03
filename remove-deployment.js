@@ -26,6 +26,8 @@ const removeDeployment = async (id) => {
 
 const run = async () => {
   const deployments = await getDeployments();
+  console.log(developments);
+  console.log(BRANCH_NAME);
   const targetDeployments = deployments.filter((d) => d.name === BRANCH_NAME);
 
   for (const deployment of targetDeployments) {
