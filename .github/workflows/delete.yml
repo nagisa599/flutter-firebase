@@ -23,10 +23,12 @@ jobs:
         id: fetch_deployments
         run: |
           echo "Fetching deployments for the closed PR branch..."
+
           DEPLOYMENTS=$(vercel list ${{ github.repository }} --token ${{ secrets.TOKEN }} --json)
           echo "::set-output name=deployments::$DEPLOYMENTS"
         env:
           VERCEL_TOKEN: ${{ secrets.TOKEN }}
+
 
       - name: Filter and Remove Deployments
         run: |
@@ -42,3 +44,4 @@ jobs:
           done
         env:
           VERCEL_TOKEN: ${{ secrets.TOKEN }}
+

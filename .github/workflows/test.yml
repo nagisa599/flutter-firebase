@@ -33,7 +33,22 @@ jobs:
         run: npm i -g vercel
 
       - name: Deploy to Vercel
-        run: vercel deploy --prod --token ${{ secrets.TOKEN }}
+        id: deploy
+        run: echo "::set-output name=url::$(vercel deploy --prod --token ${{ secrets.TOKEN }} | grep -oP 'https://\S+\.vercel\.app')"
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Comment Deploy URL
+        uses: actions/github-script@v5
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const url = '${{ steps.deploy.outputs.url }}';
+            const message = `Deployed URL: ${url}`;
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: message
+            });
