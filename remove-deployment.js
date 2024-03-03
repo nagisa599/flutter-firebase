@@ -29,7 +29,9 @@ const run = async () => {
   console.log("aaa", deployments[0].meta.githubCommitMessage);
   console.log("bbb", deployments[0]);
   console.log(BRANCH_NAME);
-  const targetDeployments = deployments.filter((d) => d.includes(BRANCH_NAME));
+  const targetDeployments = deployments.filter((d) =>
+    d.meta.githubCommitMessage.includes(BRANCH_NAME)
+  );
   console.log("targetDeployments", targetDeployments);
   for (const deployment of targetDeployments) {
     console.log(`Removing deployment: ${deployment.url}`);
