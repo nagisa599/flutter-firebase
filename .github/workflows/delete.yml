@@ -1,11 +1,21 @@
+
 name: Remove Vercel Deployment for Closed PR
+
 
 on:
   pull_request:
     types: [closed]
+    branches:
+      - develop
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
 
 jobs:
-  cleanup:
+  remove-deployment:
+    if: github.event.pull_request.merged == true || github.event.pull_request.state == 'closed'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
