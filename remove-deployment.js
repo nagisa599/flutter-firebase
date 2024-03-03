@@ -1,4 +1,4 @@
-import fetch from "node-fetch";
+const fetch = require("node-fetch");
 const VERCEL_TOKEN = process.env.VERCEL_TOKEN;
 const BRANCH_NAME = process.env.BRANCH_NAME;
 const VERCEL_PROJECT_ID = process.env.VERCEL_PROJECT_ID;
