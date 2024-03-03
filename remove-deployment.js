@@ -26,7 +26,7 @@ const removeDeployment = async (id) => {
 
 const run = async () => {
   const deployments = await getDeployments();
-  console.log("aaa", deployments.meta.githubCommitRef);
+  console.log("aaa", deployments[0].meta.githubCommitRef);
   console.log("bbb", meta);
   console.log(BRANCH_NAME);
   const targetDeployments = deployments.filter((d) => d.name === BRANCH_NAME);
