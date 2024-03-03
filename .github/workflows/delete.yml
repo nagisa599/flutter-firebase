@@ -1,0 +1,44 @@
+name: Cleanup Vercel Deployments on PR Close
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "14"
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel
+
+      - name: Fetch Deployments
+        id: fetch_deployments
+        run: |
+          echo "Fetching deployments for the closed PR branch..."
+          DEPLOYMENTS=$(vercel list ${{ github.repository }} --token ${{ secrets.VERCEL_TOKEN }} --json)
+          echo "::set-output name=deployments::$DEPLOYMENTS"
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
+      - name: Filter and Remove Deployments
+        run: |
+          DEPLOYMENTS="${{ steps.fetch_deployments.outputs.deployments }}"
+          BRANCH_NAME="${{ github.head_ref }}"
+          echo "Filtering deployments for branch: $BRANCH_NAME"
+
+          DEPLOYMENT_IDS=$(echo $DEPLOYMENTS | jq -r --arg BRANCH_NAME "$BRANCH_NAME" '.[] | select(.name | test($BRANCH_NAME)) | .uid')
+
+          for ID in $DEPLOYMENT_IDS; do
+            echo "Removing deployment: $ID"
+            vercel remove $ID --yes --token ${{ secrets.VERCEL_TOKEN }}
+          done
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
