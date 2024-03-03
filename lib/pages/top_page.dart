@@ -88,7 +88,7 @@ class _TopPageState extends State<TopPage> {
                                   children: [
                                     ListTile(
                                       leading: Icon(Icons.edit),
-                                      title: Text('編集'),
+                                      title: Text('編集2'),
                                       onTap: (() {
                                         Navigator.push(context,
                                             MaterialPageRoute(
