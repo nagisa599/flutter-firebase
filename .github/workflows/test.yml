@@ -1,4 +1,4 @@
-name: Flutter Web Build and Deploy
+name: Flutter Web Build and Deploy to Vercel
 
 on:
   pull_request:
@@ -9,15 +9,9 @@ permissions:
   contents: read
   issues: write
   pull-requests: write
-  pages: write
-  id-token: write
-
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -26,41 +20,20 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: "stable" # ここはバージョン固定したほうがいいです
+          channel: "stable"
           cache: true
 
-      - run: flutter pub get
-      - run: flutter build web --web-renderer html
+      - name: Get dependencies
+        run: flutter pub get
 
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v2
-        with:
-          path: ./build/web
+      - name: Build
+        run: flutter build web --web-renderer html
 
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v2
+      - name: Install Vercel CLI
+        run: npm i -g vercel
 
-      - name: Notify Pull Request
-        if: github.event_name == 'pull_request'
-        uses: actions/github-script@v4
-        with:
-          script: |
-            const pullRequestNumber = context.issue.number;
-            const repositoryOwner = context.repo.owner;
-            const repositoryName = context.repo.repo;
-            const pageUrl = `https://${repositoryOwner}.github.io/${repositoryName}/`;
-            const comment = `Preview URL for this pull request: ${pageUrl}`;
-            github.issues.createComment({
-              owner: repositoryOwner,
-              repo: repositoryName,
-              issue_number: pullRequestNumber,
-              body: comment
-            });
+      - name: Deploy to Vercel
+        run: vercel deploy --prod --token ${{ secrets.TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
