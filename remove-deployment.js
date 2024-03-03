@@ -36,6 +36,7 @@ const removeDeployment = async (id) => {
     }
     const data = await response.json(); // または response.text() で生のレスポンスを確認
     console.log("Response data:", data);
+
   } catch (error) {
     console.error("Request failed:", error);
   }
