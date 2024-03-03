@@ -31,7 +31,7 @@ const removeDeployment = async (id) => {
         headers: { Authorization: `Bearer ${VERCEL_TOKEN}` },
       }
     );
-    console.log(response);
+    console.log("response", response);
   } catch (error) {
     console.error(error);
   }
