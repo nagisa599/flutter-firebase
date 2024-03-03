@@ -31,9 +31,14 @@ const removeDeployment = async (id) => {
         headers: { Authorization: `Bearer ${VERCEL_TOKEN}` },
       }
     );
-    console.log("response", response);
+    if (!response.ok) {
+      console.error(`Error: ${response.statusText}`);
+    }
+    const data = await response.json(); // または response.text() で生のレスポンスを確認
+    console.log("Response data:", data);
+
   } catch (error) {
-    console.error(error);
+    console.error("Request failed:", error);
   }
 };
 
