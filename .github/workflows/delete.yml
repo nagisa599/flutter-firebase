@@ -23,10 +23,12 @@ jobs:
         id: fetch_deployments
         run: |
           echo "Fetching deployments for the closed PR branch..."
-          DEPLOYMENTS=$(vercel list ${{ github.repository }} --token ${{ secrets.VERCEL_TOKEN }} --json)
+
+          DEPLOYMENTS=$(vercel list ${{ github.repository }} --token ${{ secrets.TOKEN }} --json)
           echo "::set-output name=deployments::$DEPLOYMENTS"
         env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_TOKEN: ${{ secrets.TOKEN }}
+
 
       - name: Filter and Remove Deployments
         run: |
@@ -38,7 +40,8 @@ jobs:
 
           for ID in $DEPLOYMENT_IDS; do
             echo "Removing deployment: $ID"
-            vercel remove $ID --yes --token ${{ secrets.VERCEL_TOKEN }}
+            vercel remove $ID --yes --token ${{ secrets.TOKEN }}
           done
         env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_TOKEN: ${{ secrets.TOKEN }}
+
