@@ -7,14 +7,19 @@ const fetch = (...args) =>
   import("node-fetch").then(({ default: fetch }) => fetch(...args));
 
 const getDeployments = async () => {
-  const response = await fetch(
-    `https://api.vercel.com/v6/deployments?projectId=${VERCEL_PROJECT_ID}`,
-    {
-      headers: { Authorization: `Bearer ${VERCEL_TOKEN}` },
-    }
-  );
-  const { deployments } = await response.json();
-  return deployments;
+  try {
+    const response = await fetch(
+      `https://api.vercel.com/v6/deployments?projectId=${VERCEL_PROJECT_ID}`,
+      {
+        headers: { Authorization: `Bearer ${VERCEL_TOKEN}` },
+      }
+    );
+    const { deployments } = await response.json();
+    console.log(deployments);
+    return deployments;
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 const removeDeployment = async (id) => {
