@@ -26,11 +26,11 @@ const removeDeployment = async (id) => {
 
 const run = async () => {
   const deployments = await getDeployments();
-  console.log("aaa", deployments[0].meta.githubCommitRef);
+  console.log("aaa", deployments[0].meta.githubCommitMessage);
   console.log("bbb", deployments[0]);
   console.log(BRANCH_NAME);
-  const targetDeployments = deployments.filter((d) => d.name === BRANCH_NAME);
-
+  const targetDeployments = deployments.filter((d) => d.includes(BRANCH_NAME));
+  console.log("targetDeployments", targetDeployments);
   for (const deployment of targetDeployments) {
     console.log(`Removing deployment: ${deployment.url}`);
     await removeDeployment(deployment.uid);
