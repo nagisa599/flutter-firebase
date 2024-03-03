@@ -1,4 +1,6 @@
-name: Remove Vercel Preview Deployment
+
+name: Remove Vercel Deployment for Closed PR
+
 
 on:
   pull_request:
@@ -16,38 +18,20 @@ jobs:
     if: github.event.pull_request.merged == true || github.event.pull_request.state == 'closed'
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy to Vercel and get deployment URL
-        id: vercel_deploy
-        run: |
-          DEPLOYMENT_URL=$(vercel --token ${{ secrets.TOKEN }} --scope ${{ secrets.VERCEL_ORG_ID }} | tail -1)
-          echo "Deployment URL: $DEPLOYMENT_URL"
-          echo "::set-output name=url::$DEPLOYMENT_URL"
-        env:
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-      - name: Comment Deploy URL on PR
-        uses: actions/github-script@v5
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
         with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          script: |
-            const deploymentUrl = '${{ steps.vercel_deploy.outputs.url }}';
-            const message = `Preview Deployment URL: ${deploymentUrl}`;
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: message
-            });
+          node-version: "14"
 
-      - name: Checkout
-        uses: actions/checkout@v3
+      - name: Install Dependencies
+        run: npm install node-fetch
 
-      - name: Install Vercel CLI
-        run: npm install -g vercel
-
-      - name: Remove Vercel Deployment
-        run: vercel rm --token ${{ secrets.TOKEN }} --yes <Deployment ID>
+      - name: Remove Deployment
+        run: node remove-deployment.js
         env:
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VERCEL_TOKEN: ${{ secrets.TOKEN }}
+          BRANCH_NAME: ${{ github.head_ref }}
