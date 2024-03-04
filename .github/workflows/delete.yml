@@ -1,21 +1,11 @@
-
-name: Remove Vercel Deployment for Closed PR
-
+name: Cleanup Vercel Deployments
 
 on:
   pull_request:
     types: [closed]
-    branches:
-      - develop
-
-permissions:
-  contents: read
-  issues: write
-  pull-requests: write
 
 jobs:
-  remove-deployment:
-    if: github.event.pull_request.merged == true || github.event.pull_request.state == 'closed'
+  cleanup:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -26,12 +16,43 @@ jobs:
         with:
           node-version: "14"
 
-      - name: Install Dependencies
+      - name: Install dependencies
         run: npm install node-fetch
 
-      - name: Remove Deployment
-        run: node remove-deployment.js
+      - name: Cleanup Vercel Deployments
         env:
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
           VERCEL_TOKEN: ${{ secrets.TOKEN }}
-          BRANCH_NAME: ${{ github.head_ref }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          GITHUB_REF_NAME: ${{ github.head_ref }}
+        run: |
+          const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+
+          const getDeployments = async () => {
+            const response = await fetch(
+              `https://api.vercel.com/v6/deployments?projectId=${process.env.VERCEL_PROJECT_ID}`,
+              {
+                headers: { Authorization: `Bearer ${process.env.VERCEL_TOKEN}` },
+              }
+            );
+            const { deployments } = await response.json();
+            return deployments.filter(d => d.meta.githubCommitRef === process.env.GITHUB_REF_NAME);
+          };
+
+          const removeDeployment = async (id) => {
+            await fetch(
+              `https://api.vercel.com/v13/deployments/${id}`,
+              {
+                method: "DELETE",
+                headers: { Authorization: `Bearer ${process.env.VERCEL_TOKEN}` },
+              }
+            );
+          };
+
+          (async () => {
+            const deployments = await getDeployments();
+            for (const deployment of deployments) {
+              console.log(`Removing deployment: ${deployment.url}`);
+              await removeDeployment(deployment.uid);
+            }
+          })().catch(console.error);
+        shell: node
