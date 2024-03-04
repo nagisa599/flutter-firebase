@@ -3,7 +3,7 @@ name: Flutter Web Build and Deploy to Vercel Preview
 on:
   pull_request:
     branches:
-      - develop
+      - main
 
 permissions:
   contents: read

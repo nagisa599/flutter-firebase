@@ -1,27 +1,27 @@
-name: Cleanup Vercel Deployments
+# name: Cleanup Vercel Deployments
 
-on:
-  pull_request:
-    types: [closed]
+# on:
+#   pull_request:
+#     types: [closed]
 
-jobs:
-  cleanup:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+# jobs:
+#   cleanup:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v2
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: "14"
+#       - name: Setup Node.js
+#         uses: actions/setup-node@v2
+#         with:
+#           node-version: "14"
 
-      - name: Install dependencies
-        run: npm install node-fetch
+#       - name: Install dependencies
+#         run: npm install node-fetch
 
-      - name: Cleanup Vercel Deployments
-        env:
-          VERCEL_TOKEN: ${{ secrets.TOKEN }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-          GITHUB_REF_NAME: ${{ github.head_ref }}
-        run: node ./scripts/cleanup-vercel-deployments.js
+#       - name: Cleanup Vercel Deployments
+#         env:
+#           VERCEL_TOKEN: ${{ secrets.TOKEN }}
+#           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+#           GITHUB_REF_NAME: ${{ github.head_ref }}
+#         run: node ./scripts/cleanup-vercel-deployments.js
