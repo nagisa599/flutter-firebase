@@ -7,8 +7,7 @@ https://zenn.dev/articles/ffa6e82101a5f6/edit
 ## githubのURL
 
 トライアル機能を実装しましたので、登録せずにお試しいただくこともできます。
-
-https://ren-app.jp/ 
+https://fir-hosting-test-e202b.web.app/
 
 <br />
 
