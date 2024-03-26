@@ -12,6 +12,8 @@ https://fir-hosting-test-e202b.web.app/
 <br />
 
 ## アプリケーションのイメージ
+<img width="1710" alt="スクリーンショット 2024-03-26 22 53 48" src="https://github.com/nagisa599/flutter-firebase/assets/134048673/21d863a0-56ed-4ed6-a135-1427d78373fc">
+
 ![アプリケーションのイメージ](/docs/img/app-view/app-view_1.1.gif)
 
 <br />
